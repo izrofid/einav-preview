@@ -13,12 +13,14 @@ export const mapLocations: MapLocation[] = [
     ["MAP_ROUTE110", "Route 110"],
     ["MAP_ROUTE111", "Route 111"],
     ["MAP_ROUTE112", "Route 112"],
+    ["MAP_ROUTE113", "Route 113"],
     ["MAP_ROUTE114", "Route 114"],
     ["MAP_ROUTE115", "Route 115"],
     ["MAP_ROUTE116", "Route 116"],
     ["MAP_ROUTE117", "Route 117"],
     ["MAP_ROUTE118", "Route 118"],
     ["MAP_ROUTE119", "Route 119"],
+    ["MAP_ROUTE120", "Route 120"],
     ["MAP_ROUTE121", "Route 121"],
     ["MAP_ROUTE122", "Route 122"],
     ["MAP_ROUTE123", "Route 123"],
@@ -29,7 +31,9 @@ export const mapLocations: MapLocation[] = [
     ["MAP_ROUTE128", "Route 128"],
     ["MAP_ROUTE129", "Route 129"],
     ["MAP_ROUTE130", "Route 130"],
+    ["MAP_ROUTE131", "Route 131"],
     ["MAP_ROUTE132", "Route 132"],
+    ["MAP_ROUTE133", "Route 133"],
     ["MAP_ROUTE134", "Route 134"],
     ["MAP_PETALBURG_WOODS", "Petalburg Woods"],
     ["MAP_RUSTURF_TUNNEL", "Rusturf Tunnel"],
@@ -87,7 +91,14 @@ export const mapLocations: MapLocation[] = [
     ["MAP_RUSTBORO_CITY", "Rustboro City"],
     ["MAP_SLATEPORT_CITY", "Slateport City"],
     ["MAP_SOOTOPOLIS_CITY", "Sootopolis City"],
-    ["MAP_SCORCHED_SLAB", "Scorched Slab"]
+    ["MAP_MOSSDEEP_CITY", "Mossdeep City"],
+    ["MAP_EVER_GRANDE_CITY", "Ever Grande City"],
+    ["MAP_SCORCHED_SLAB", "Scorched Slab"],
+    ["MAP_SKY_PILLAR_1F", "Sky Pillar 1F"],
+    ["MAP_SKY_PILLAR_2F", "Sky Pillar 2F"],
+    ["MAP_SKY_PILLAR_3F", "Sky Pillar 3F"],
+    ["MAP_SKY_PILLAR_4F", "Sky Pillar 4F"],
+    ["MAP_SKY_PILLAR_5F", "Sky Pillar 5F"]
 ];
 
 export default mapLocations;
