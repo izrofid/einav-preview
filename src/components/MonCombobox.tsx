@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Combobox,
   ComboboxButton,
@@ -9,54 +9,55 @@ import {
 import {
   HiOutlineChevronUpDown,
   HiOutlineMagnifyingGlass,
-  HiOutlineMapPin,
 } from "react-icons/hi2";
-import { HiLocationMarker } from "react-icons/hi";
 import { useMapStore } from "../stores/mapStore";
-import type { RegionData } from "../stores/mapStore";
-import mapLocations from "@/utils/generateMapLocations";
+import speciesData from "@/data/speciesData.json";
 
-interface MapComboboxProps {
+interface MonComboboxProps {
   width?: string;
-  onRegionDataChange?: (
-    regionId: string | null,
-    regionData: RegionData | null
-  ) => void;
 }
 
-const MapCombobox: React.FC<MapComboboxProps> = ({ onRegionDataChange }) => {
-  const { selectedRegionId, setRegionData, setSelectedRegion } = useMapStore();
+const MonCombobox: React.FC<MonComboboxProps> = () => {
+  const { selectedPokemonSpecies, setSelectedPokemon } = useMapStore();
   const [query, setQuery] = useState("");
 
-  const filteredLocations =
-    query === ""
-      ? mapLocations
-      : mapLocations.filter(([, name]) => {
-          return name.toLowerCase().includes(query.toLowerCase());
-        });
+  // Create a list of all Pokemon species using speciesData.json
+  const pokemonSpecies = useMemo(() => {
+    return speciesData
+      .map((species, index) => {
+        const speciesId = index + 1; // speciesData is 0-indexed, but species IDs start at 1
+        return {
+          speciesName: `SPECIES_${species.nameKey.toUpperCase().replace(/[^A-Z0-9]/g, '_')}`,
+          speciesId,
+          displayName: species.nameKey,
+          spriteUrl: `sprites/front/${speciesId}.png`,
+        };
+      })
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, []);
 
-  const selectedLocation = selectedRegionId
-    ? mapLocations.find(([id]) => id === selectedRegionId) ?? null
+  const filteredPokemon = useMemo(() => {
+    if (query === "") return pokemonSpecies
+    return pokemonSpecies.filter(pokemon =>
+      pokemon.displayName.toLowerCase().includes(query.toLowerCase())
+    )
+  }, [query, pokemonSpecies]);
+
+  const selectedPokemon = selectedPokemonSpecies
+    ? pokemonSpecies.find(p => p.speciesName === selectedPokemonSpecies) ?? null
     : null;
 
-  const handleSelect = (location: [string, string]) => {
-    const [regionId] = location;
-    const mockData: RegionData = {
-      name: location[1],
-      description: `Region information for ${location[1]}`,
-      visited: Math.random() > 0.5,
-    };
-    setSelectedRegion(regionId);
-    setRegionData(mockData);
-    onRegionDataChange?.(regionId, mockData);
+  const handleSelect = (pokemon: typeof pokemonSpecies[0]) => {
+    setSelectedPokemon(pokemon.speciesName);
   };
 
   return (
     <div className="relative group">
       <Combobox
-        value={selectedLocation}
+        value={selectedPokemon}
         onChange={handleSelect}
         onClose={() => setQuery("")}
+        virtual={{ options: filteredPokemon }}
         immediate={false}
       >
         <div className="relative">
@@ -71,12 +72,12 @@ const MapCombobox: React.FC<MapComboboxProps> = ({ onRegionDataChange }) => {
               placeholder:text-gray-400 transition-all duration-300 
               hover:bg-gradient-to-r hover:from-white/12 hover:to-white/16
               hover:border-white/30 hover:shadow-lg"
-            displayValue={(location: [string, string] | null) =>
-              location ? location[1] : ""
+            displayValue={(pokemon: typeof pokemonSpecies[0] | null) =>
+              pokemon ? pokemon.displayName : ""
             }
             onChange={(event) => setQuery(event.target.value)}
-            aria-label="Location selector"
-            placeholder="Search locations..."
+            aria-label="Pokemon selector"
+            placeholder="Search Pokémon..."
           />
           <ComboboxButton className="group absolute inset-y-0 right-0 px-2.5">
             <HiOutlineChevronUpDown className="h-5 w-5 text-gray-400 group-focus-within:text-blue-400 transition-colors cursor-pointer" />
@@ -84,25 +85,25 @@ const MapCombobox: React.FC<MapComboboxProps> = ({ onRegionDataChange }) => {
         </div>
         <ComboboxOptions
           className="w-(--input-width) bg-gray-800/80 border border-gray-500/50 backdrop-blur-xl
-          rounded-md shadow-2xl h-64 shadow-black/50 [--anchor-gap:8px] z-100"
+          rounded-md shadow-2xl h-64 shadow-black/50 [--anchor-gap:8px] overflow-y-auto z-100"
           anchor="bottom start"
         >
-          {filteredLocations.length === 0 ? (
+          {filteredPokemon.length === 0 ? (
             <div className="px-6 py-8 text-center text-gray-400">
-              <HiOutlineMapPin className="mx-auto h-16 w-16 text-gray-600 mb-3 opacity-50" />
+              <div className="mx-auto h-16 w-16 text-gray-600 mb-3 opacity-50">🔍</div>
               <p className="text-lg font-medium text-gray-300 mb-1">
-                No locations found
+                No Pokémon found
               </p>
               <p className="text-sm text-gray-500">
                 Try adjusting your search term
               </p>
             </div>
           ) : (
-            filteredLocations.map((location) => (
+            ({ option: pokemon }) => (
               <ComboboxOption
-                key={location[0]}
-                value={location}
-                className="group relative cursor-pointer select-none py-4 px-5 text-gray-300 
+                key={pokemon.speciesName}
+                value={pokemon}
+                className="group relative w-full cursor-pointer select-none py-4 px-5 text-gray-300 
                   data-focus:bg-gradient-to-r data-focus:from-blue-500/20 data-focus:via-purple-500/15 data-focus:to-blue-500/20 
                   data-focus:text-white transition-all duration-200 
                   first:rounded-t-xl last:rounded-b-xl
@@ -111,11 +112,19 @@ const MapCombobox: React.FC<MapComboboxProps> = ({ onRegionDataChange }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="relative">
-                      <HiLocationMarker className="h-5 w-5 mr-4 text-gray-500 group-data-focus:text-blue-400 transition-colors duration-200" />
+                      <img
+                        src={pokemon.spriteUrl}
+                        alt={pokemon.displayName}
+                        className="h-8 w-8 mr-4 object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                        }}
+                      />
                     </div>
                     <div>
                       <span className="block font-medium text-base group-data-focus:text-white transition-colors duration-200">
-                        {location[1]}
+                        {pokemon.displayName}
                       </span>
                     </div>
                   </div>
@@ -124,7 +133,7 @@ const MapCombobox: React.FC<MapComboboxProps> = ({ onRegionDataChange }) => {
                   </div>
                 </div>
               </ComboboxOption>
-            ))
+            )
           )}
         </ComboboxOptions>
       </Combobox>
@@ -132,4 +141,4 @@ const MapCombobox: React.FC<MapComboboxProps> = ({ onRegionDataChange }) => {
   );
 };
 
-export default MapCombobox;
+export default MonCombobox;

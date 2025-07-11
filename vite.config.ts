@@ -5,6 +5,7 @@ import path from "path"
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/einav-preview/', // Set the base path for GitHub Pages
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

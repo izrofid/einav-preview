@@ -59,3 +59,27 @@ export interface WildEncounterGroup {
 export interface WildEncountersData {
   wild_encounter_groups: WildEncounterGroup[];
 }
+
+export interface PokemonLocationData {
+  locationId: string;
+  locationName: string;
+  method: string;
+  min_level: number;
+  max_level: number;
+  slot?: number;
+  encounterRate?: number;
+}
+
+export interface PokemonEncounterData {
+  species: string;
+  locations: PokemonLocationData[];
+}
+
+export interface GroupedPokemonEncounters {
+  land_mons: PokemonLocationData[];
+  water_mons: PokemonLocationData[];
+  rock_smash_mons: PokemonLocationData[];
+  fishing_old_rod: PokemonLocationData[];
+  fishing_good_rod: PokemonLocationData[];
+  fishing_super_rod: PokemonLocationData[];
+}
